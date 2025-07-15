@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | Delligence Academy</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="https://img.icons8.com/color/48/school-building.png" type="image/png">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <h1>Delligence Academy</h1>
+    <p>Where excellence meets education</p>
+    <nav class="navbar">
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('about') }}">About</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+      <a href="{{ url_for('homework') }}">Homework</a>
+      {% if user_type == 'teacher' %}
+      <a href="{{ url_for('tests') }}">Tests</a>
+      {% endif %}
+      <a href="{{ url_for('fees') }}">Fees</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+  </header>
+
+  <!-- Main About Section -->
+  <main class="container" style="padding: 40px 20px; background: #fff; border-radius: 10px; margin-top: 30px;">
+
+    <h2 style="text-align:center; font-size: 28px; margin-bottom: 25px;">About Delligence Academy</h2>
+
+    <p style="max-width: 800px; margin: auto; font-size: 17px; color: #2c3e50; line-height: 1.8;">
+      Delligence Academy is a premier educational institute committed to nurturing brilliance, encouraging creativity, 
+      and building a strong academic foundation for students from all walks of life. Our mission is to provide a 
+      learning environment that fosters growth, confidence, and academic excellence.
+    </p>
+
+    <br>
+
+    <p style="max-width: 800px; margin: auto; font-size: 17px; color: #2c3e50; line-height: 1.8;">
+      With experienced educators, modern teaching methodologies, and a focus on holistic development, 
+      Delligence Academy stands as a symbol of quality and dedication. We aim to empower students not just 
+      with knowledge, but also with values, confidence, and curiosity.
+    </p>
+
+    <br>
+
+    <p style="max-width: 800px; margin: auto; font-size: 17px; color: #2c3e50; line-height: 1.8;">
+      Join us on a journey to explore your potential and unlock a future full of possibilities.
+    </p>
+  </main>
+
+  <section style="margin-top: 40px; text-align: center;">
+    <h3>Want to get in touch?</h3>
+    <p>Have questions or want to join Delligence Academy? <br><a href="{{ url_for('contact') }}">Click here to contact us.</a></p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 Delligence Academy. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

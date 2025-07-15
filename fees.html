@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monthly Fees | Delligence Academy</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="https://img.icons8.com/color/48/school-building.png" type="image/png">
+  <style>
+    button {
+        background-color: navajowhite;
+        font-family: fantasy;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <h1>Delligence Academy</h1>
+    <p>Monthly Fee Management</p>
+    <nav class="navbar">
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('about') }}">About</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+      <a href="{{ url_for('fees') }}">Fees</a>
+      <a href="{{ url_for('tests') }}">Tests</a>
+      <a href="{{ url_for('homework') }}">Homework</a>
+    </nav>
+  </header>
+
+  <main class="container" style="padding: 30px; background: #fff; border-radius: 10px; margin-top: 30px;">
+    <h2 style="text-align: center;">Submit Monthly Fee</h2>
+
+    {% if msg %}
+    <div style="text-align: center; padding: 10px; margin: 20px 0; border-radius: 5px; background-color: {% if '✅' in msg %}#d4edda{% else %}#f8d7da{% endif %};">
+      {{ msg }}
+    </div>
+    {% endif %}
+
+    <!-- Fee Submission Form -->
+    <form method="POST" style="max-width: 500px; margin: auto; display: flex; flex-direction: column; gap: 15px;">
+      <select name="student_id" required style="padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+        <option value="">Select Student</option>
+        {% for student in students %}
+          <option value="{{ student[0] }}">{{ student[0] }} - {{ student[1] }}</option>
+        {% endfor %}
+      </select>
+
+      <input type="number" name="amount" placeholder="Fee Amount (₹)" min="0" required style="padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+
+      <div style="display: flex; gap: 10px;">
+        <select name="month" required style="flex:1; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+          <option value="">Month</option>
+          {% for m in ['January','February','March','April','May','June','July','August','September','October','November','December'] %}
+            <option value="{{ m }}">{{ m }}</option>
+          {% endfor %}
+        </select>
+        <input type="number" name="year" placeholder="Year" value="2025" required style="flex:1; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+      </div>
+
+      <button type="submit" style="padding: 12px; border: none; border-radius: 5px; cursor: pointer;">Submit Fee</button>
+    </form>
+
+    <!-- Fee Records Table -->
+    <h2 style="text-align: center; margin-top: 50px;">Fee Records</h2>
+
+    {% if fee_records %}
+    <table>
+      <thead>
+        <tr>
+          <th>Student Name</th>
+          <th>Amount</th>
+          <th>Month</th>
+          <th>Year</th>
+          <th>Recorded On</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in fee_records %}
+        <tr>
+          <td>{{ r[0] }}</td>
+          <td>₹{{ r[1] }}</td>
+          <td>{{ r[2] }}</td>
+          <td>{{ r[3] }}</td>
+          <td>{{ r[4] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; color: gray;">No fee records yet.</p>
+    {% endif %}
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 Delligence Academy. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

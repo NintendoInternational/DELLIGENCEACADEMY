@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Delligence Academy - Student Records</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="https://img.icons8.com/color/48/school-building.png" type="image/png">
+</head>
+<body>
+  <!-- 🔒 Password Protection Overlay -->
+<div id="passwordOverlay" class="password-overlay">
+  <div class="password-container">
+    <div class="redirect">
+      <h1>Delligence Academy</h1>
+      <p>Access Student Records</p>
+      <p style="color: red;font-size: smaller;"># If you are the council Member Enter Password</p>
+      <a href="{{ url_for('about') }}">About Us</a>
+      <a href="{{ url_for('contact') }}">Contact Us</a>
+      <a href="{{ url_for('messages') }}">Messages</a>
+    </div>
+    <h2>🔐 This is for Security</h2>
+    <input type="password" id="passwordInput" placeholder="Enter password">
+    <button onclick="validatePassword()">Enter</button>
+    <p id="errorMsg"></p>
+  </div>
+</div>
+
+<!-- ✅ Site Header -->
+<header class="site-header">
+  <h1>Delligence Academy</h1>
+  <p>Where excellence meets education</p>
+
+  <!-- ✅ Navigation -->
+  <nav class="navbar">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('about') }}">About</a>
+    <a href="{{ url_for('contact') }}">Contact</a>
+    <a href="{{ url_for('homework')}}">Homework</a>
+    {% if user_type == 'teacher' or user_type == 'admin' %}
+    <a href="{{ url_for('tests')}}">Tests</a>
+    <a href="{{ url_for('fees')}}">Fees</a>
+    {% endif %}
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </nav>
+</header>
+
+  <h1>📘 Student Records</h1>
+
+  <!-- User Info Display -->
+  {% if user_type %}
+  <div style="text-align: center; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+    <p style="margin: 0; font-size: 16px; color: #2c3e50;">
+      👋 Welcome, <strong>{{ user_info.name }}</strong> 
+      {% if user_type == 'student' %}
+        (Student ID: {{ user_info.id }})
+      {% elif user_type == 'teacher' %}
+        (Teacher)
+      {% endif %}
+    </p>
+  </div>
+  {% endif %}
+
+  {% if user_type == 'student' %}
+  <!-- Student Todo List -->
+  <h2>📝 My To-Do List</h2>
+  <div style="max-width: 600px; margin: 0 auto;">
+    <form id="todoForm" style="display: flex; gap: 10px; margin-bottom: 20px;">
+      <input type="text" id="todoInput" placeholder="Add new task..." style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+      <button type="submit" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Add Task</button>
+    </form>
+    
+    <div id="todoList" style="background: #f8f9fa; padding: 20px; border-radius: 10px; min-height: 200px;">
+      <p style="text-align: center; color: #7f8c8d; margin: 0;">No tasks added yet. Add your first task above!</p>
+    </div>
+  </div>
+  {% else %}
+  <!-- Add Student Form (Only visible if NOT a student) -->
+  {% if user_type == 'teacher' or user_type == 'admin' %}
+  <form method="POST" action="/add">
+    <input type="text" name="name" placeholder="Enter Name" required>
+    <input type="number" name="marks" placeholder="Enter Marks" required>
+    <button type="submit">Add Student</button>
+  </form>
+  {% endif %}
+
+  <h2>📋 Student List</h2>
+  <table border="1">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th class="no-print">Marks</th>
+      <th class="">Action</th>
+    </tr>
+    {% for student in students %}
+    <tr>
+      <td>{{ student[0] }}</td>
+      <td>{{ student[1] }}</td>
+      <td class="no-print">{{ student[2] }}</td>
+      <td class=""><a href="/delete/{{ student[0] }}">ACTIVE</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+
+<!-- 🔻 Footer with Social Icons -->
+<footer class="site-footer">
+  <div class="container">
+    <p>&copy; 2025 Delligence Academy. All Rights Reserved.</p>
+    <p>📍 Ayodhya, India | 📞 +91 9454363059 | ✉️ shouryamishra038@gmail.com</p>
+    <div class="social-icons">
+      <a href="https://www.youtube.com/"><img src="https://img.icons8.com/fluency/24/youtube-play.png" alt="YouTube"></a>
+      <a href="https://mail.google.com/"><img src="https://img.icons8.com/fluency/24/gmail.png" alt="Email"></a>
+      <a href="https://www.instagram.com/shivaymiishra"><img src="https://img.icons8.com/fluency/24/instagram-new.png" alt="Instagram"></a>
+    </div>
+  </div>
+  <a href="{{ url_for('logout') }}" style="display: inline-block; background: #e74c3c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 10px;">🔓 Logout</a>
+  <button onclick="window.print()" class="print-btn">🖨️ Print Student List</button>
+</footer>
+
+<script>
+  // Auto-hide overlay if already logged in
+  window.onload = function () {
+    if (localStorage.getItem("isAuthenticated") === "true") {
+      document.getElementById("passwordOverlay").style.display = "none";
+    }
+    loadTodos();
+  };
+
+  function validatePassword() {
+    const input = document.getElementById("passwordInput").value;
+    const errorMsg = document.getElementById("errorMsg");
+
+    // Send password to server for validation
+    fetch('/validate-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password: input })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.valid) {
+        localStorage.setItem("isAuthenticated", "true");
+        document.getElementById("passwordOverlay").style.display = "none";
+      } else {
+        errorMsg.textContent = "❌ Incorrect password!";
+      }
+    })
+    .catch(error => {
+      errorMsg.textContent = "❌ Error validating password!";
+    });
+  }
+  
+  function logoutUser() {
+    localStorage.removeItem("isAuthenticated");
+    location.reload();
+  }
+
+  // Todo List Functions
+  function loadTodos() {
+    const todoForm = document.getElementById("todoForm");
+    const todoList = document.getElementById("todoList");
+    
+    if (!todoForm || !todoList) return;
+
+    const todos = JSON.parse(localStorage.getItem("studentTodos") || "[]");
+    renderTodos(todos);
+
+    todoForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const input = document.getElementById("todoInput");
+      const task = input.value.trim();
+      
+      if (task) {
+        const newTodo = {
+          id: Date.now(),
+          text: task,
+          completed: false,
+          timestamp: new Date().toLocaleString()
+        };
+        
+        todos.push(newTodo);
+        localStorage.setItem("studentTodos", JSON.stringify(todos));
+        input.value = "";
+        renderTodos(todos);
+      }
+    });
+  }
+
+  function renderTodos(todos) {
+    const todoList = document.getElementById("todoList");
+    if (!todoList) return;
+
+    if (todos.length === 0) {
+      todoList.innerHTML = '<p style="text-align: center; color: #7f8c8d; margin: 0;">No tasks added yet. Add your first task above!</p>';
+      return;
+    }
+
+    const todoHTML = todos.map(todo => `
+      <div style="display: flex; align-items: center; padding: 12px; margin: 8px 0; background: ${todo.completed ? '#d4edda' : 'white'}; border-radius: 8px; border-left: 4px solid ${todo.completed ? '#28a745' : '#3498db'}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <input type="checkbox" ${todo.completed ? 'checked' : ''} 
+               onchange="toggleTodo(${todo.id})" 
+               style="margin-right: 12px; transform: scale(1.2);">
+        <div style="flex: 1;">
+          <span style="text-decoration: ${todo.completed ? 'line-through' : 'none'}; color: ${todo.completed ? '#6c757d' : '#2c3e50'}; font-weight: 500;">
+            ${todo.text}
+          </span>
+          <small style="display: block; color: #7f8c8d; margin-top: 4px; font-size: 12px;">
+            Added: ${todo.timestamp}
+          </small>
+        </div>
+        <button onclick="deleteTodo(${todo.id})" 
+                style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+          Delete
+        </button>
+      </div>
+    `).join('');
+
+    todoList.innerHTML = todoHTML;
+  }
+
+  function toggleTodo(id) {
+    const todos = JSON.parse(localStorage.getItem("studentTodos") || "[]");
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+      todo.completed = !todo.completed;
+      localStorage.setItem("studentTodos", JSON.stringify(todos));
+      renderTodos(todos);
+    }
+  }
+
+  function deleteTodo(id) {
+    const todos = JSON.parse(localStorage.getItem("studentTodos") || "[]");
+    const filteredTodos = todos.filter(t => t.id !== id);
+    localStorage.setItem("studentTodos", JSON.stringify(filteredTodos));
+    renderTodos(filteredTodos);
+  }
+</script>
+
+</body>
+</html>

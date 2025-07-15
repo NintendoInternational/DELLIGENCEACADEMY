@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Delligence Academy</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="https://img.icons8.com/color/48/school-building.png" type="image/png">
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <h1>Delligence Academy</h1>
+    <p>Student & Teacher Login Portal</p>
+  </header>
+
+  <main class="container" style="padding: 40px 20px; background: #fff; border-radius: 10px; margin-top: 30px; max-width: 600px;">
+    <h2 style="text-align: center; margin-bottom: 30px;">🎓 Login Portal</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+      <button onclick="window.location.href='{{ url_for('messages') }}';" style="background-color: #2ecc71; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;  text-decoration: none;">View Messages</button>
+    </div>
+    {% if msg %}
+    <div class="message" style="text-align: center; padding: 10px; margin: 20px 0; border-radius: 5px; 
+         background-color: {% if 'successful' in msg %}#d4edda; color: #155724;{% else %}#f8d7da; color: #721c24;{% endif %}">
+      {{ msg }}
+    </div>
+    {% endif %}
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+      <!-- Student Login -->
+      <div class="login-section" style="background: #f8f9fa; padding: 25px; border-radius: 10px; border: 2px solid #3498db;">
+        <h3 style="text-align: center; color: #3498db; margin-bottom: 20px;">👨‍🎓 Student Login</h3>
+        <form method="POST" action="{{ url_for('login') }}">
+          <input type="hidden" name="user_type" value="student">
+          <div style="margin-bottom: 15px;">
+            <label for="student_id" style="display: block; margin-bottom: 5px; font-weight: bold;">Student ID:</label>
+            <input type="number" id="student_id" name="student_id" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+          </div>
+          <div style="margin-bottom: 20px;">
+            <label for="student_name" style="display: block; margin-bottom: 5px; font-weight: bold;">Student Name:</label>
+            <input type="text" id="student_name" name="student_name" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+          </div>
+          <button type="submit" style="width: 100%; background-color: #3498db; color: white; padding: 12px; 
+                  border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+            Login as Student
+          </button>
+        </form>
+      </div>
+
+      <!-- Teacher Login -->
+      <div class="login-section" style="background: #f8f9fa; padding: 25px; border-radius: 10px; border: 2px solid #e74c3c;">
+        <h3 style="text-align: center; color: #e74c3c; margin-bottom: 20px;">👩‍🏫 Teacher Login</h3>
+        <form method="POST" action="{{ url_for('login') }}">
+          <input type="hidden" name="user_type" value="teacher">
+          <div style="margin-bottom: 15px;">
+            <label for="teacher_id" style="display: block; margin-bottom: 5px; font-weight: bold;">Teacher ID:</label>
+            <input type="text" id="teacher_id" name="teacher_id" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+          </div>
+          <div style="margin-bottom: 20px;">
+            <label for="teacher_password" style="display: block; margin-bottom: 5px; font-weight: bold;">Password:</label>
+            <input type="password" id="teacher_password" name="teacher_password" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+          </div>
+          <button type="submit" style="width: 100%; background-color: #e74c3c; color: white; padding: 12px; 
+                  border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+            Login as Teacher
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px; padding: 20px; background: #ecf0f1; border-radius: 10px;">
+      <h4 style="color: #2c3e50; margin-bottom: 15px;">🔐 Admin Access</h4>
+      <p style="color: #7f8c8d; margin-bottom: 15px;">Council members can access admin panel directly</p>
+      
+      <div id="adminLoginForm" style="margin-bottom: 15px;">
+        <input type="password" id="adminPassword" placeholder="Enter Admin Password" 
+               style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px; margin-right: 10px; width: 200px;">
+        <button onclick="validateAdminAccess()" 
+                style="background-color: #2c3e50; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">
+          Access Admin Panel
+        </button>
+      </div>
+      
+      <div id="adminError" style="color: #e74c3c; margin: 10px 0; display: none;">
+        ❌ Invalid admin password!
+      </div>
+      
+      <div id="adminSuccess" style="display: none;">
+        <a href="{{ url_for('index') }}" style="display: inline-block; background-color: #27ae60; color: white; 
+           padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+          Enter Admin Panel
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 Delligence Academy. All Rights Reserved.</p>
+      <p>📍 Ayodhya, India | 📞 +91 9454363059 | ✉️ shouryamishra038@gmail.com</p>
+    </div>
+  </footer>
+
+  <script>
+    function validateAdminAccess() {
+      const password = document.getElementById('adminPassword').value;
+      const errorDiv = document.getElementById('adminError');
+      const successDiv = document.getElementById('adminSuccess');
+      const formDiv = document.getElementById('adminLoginForm');
+      
+      if (!password) {
+        errorDiv.style.display = 'block';
+        errorDiv.textContent = '❌ Please enter admin password!';
+        successDiv.style.display = 'none';
+        return;
+      }
+      
+      // Validate password with backend
+      fetch('/validate-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password: password })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.valid) {
+          formDiv.style.display = 'none';
+          errorDiv.style.display = 'none';
+          successDiv.style.display = 'block';
+          
+          // Set admin session
+          localStorage.setItem('adminAccess', 'true');
+          localStorage.setItem('adminTime', Date.now());
+        } else {
+          errorDiv.style.display = 'block';
+          errorDiv.textContent = '❌ Invalid admin password!';
+          successDiv.style.display = 'none';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        errorDiv.style.display = 'block';
+        errorDiv.textContent = '❌ Error validating password!';
+        successDiv.style.display = 'none';
+      });
+    }
+    
+    // Check if admin already authenticated
+    window.onload = function() {
+      const adminAccess = localStorage.getItem('adminAccess');
+      const adminTime = localStorage.getItem('adminTime');
+      
+      // Admin session expires after 1 hour
+      if (adminAccess === 'true' && adminTime && (Date.now() - parseInt(adminTime)) < 3600000) {
+        document.getElementById('adminLoginForm').style.display = 'none';
+        document.getElementById('adminSuccess').style.display = 'block';
+      }
+    };
+    
+    // Allow Enter key to submit admin password
+    document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        validateAdminAccess();
+      }
+    });
+
+    if (adminAccess == 'true')
+        window.location.href = "{{ url_for('index') }}";
+  </script>
+
+</body>
+</html>
